@@ -1,0 +1,83 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Cebu Food Guide</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="style.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+
+  <!-- The div to hold the map -->
+  <div id="map">
+
+  </div>
+  
+  <div id="leftPane" class="rounded-top rounded-bottom" >
+
+  <div class="card position-absolute rounded-top rounded-bottom">
+
+        <div class="p-3 border-bottom">
+          <h5 class="text-left" id="result-place-name"></h5>
+            <p id="result-header" class=" small text-left"></p>
+            <div class="d-flex text-center">
+
+              <a  id="filter-restaurant" href="#">
+                <img src="img/dining.png" height="50" class="mx-3">
+                <small>Restaurants</small>
+              </a>
+              
+              <a  id="filter-hotel" href="#"><img src="img/hotels.png" height="50" class="mx-3">
+                <small>Hotels</small>
+              </a>
+              
+              <a  id="filter-bar" href="#"><img src="img/bar.png" height="50" class="mx-3">
+                <small>Bar</small>
+              </a>
+              
+              <a  id="filter-coffee" href="#"><img src="img/coffee.png" height="50" class="mx-3">
+               <small>Coffee</small>
+              </a>    
+                     
+                     
+                     
+              </div>
+            <input id="pac-input" type="text" class="form-control" id="usr" placeholder="Search">
+            </div>
+
+        <div class="card-body p-0">
+            <ul id="list"></ul>
+        </div>
+
+  </div>
+
+
+  </div>
+
+
+  
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.slim.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+  <script src="json.js"></script>
+  <script src="app.js"></script>
+  <script src="extras.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSCTkiWuux0aCqgqjxfmVRBmr2N1hb2ms&libraries=places&callback=initMap">
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,182 @@
+    #map {
+      height: 100%;
+    }
+  
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #pane-header{
+      /* background: #696969; */
+      display:none;
+    }
+
+    /* Styling for autocomplete search bar */
+    #pac-card {
+      background-color: #fff;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      box-sizing: border-box;
+      font-family: Roboto;
+      margin: 10px 10px 0 0;
+      -moz-box-sizing: border-box;
+      outline: none;
+    }
+    
+    #pac-container {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      margin-right: 12px;
+    }
+    
+    #pac-input {
+      background-color: #fff;
+      font-family: Roboto;
+      font-size: 15px;
+      font-weight: 300;
+      margin-left: 12px;
+      padding: 0 11px 0 13px;
+      text-overflow: ellipsis;
+      width: 400px;
+      top: 2% !important;
+    }
+    
+    #pac-input:focus {
+      border-color: #4d90fe;
+    }
+    
+    #title {
+      color: #fff;
+      background-color: #acbcc9;
+      font-size: 18px;
+      font-weight: 400;
+      padding: 6px 12px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+
+    /* Styling for an info pane that slides out from the left. 
+     * Hidden by default. */
+    #panel {
+      height: 100%;
+      width: null;
+      background-color: white;
+      /* position: fixed; */
+      z-index: 1;
+      overflow-x: hidden;
+      transition: all .2s ease-out;
+      height: 75%;
+      transition: all .2s ease-out;
+      position: absolute;
+      left: 1%;
+      top: 20%;
+    }
+
+    #list p{
+    font-family: Roboto;
+    font-size: 15px;
+    font-weight: 300;
+    text-overflow: ellipsis;
+    }
+    
+    
+    .open {
+      width: 250px;
+    }
+    
+    .place {
+      font-family: 'open sans', arial, sans-serif;
+      font-size: 1.2em;
+      font-weight: 500;
+      margin-block-end: 0px;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    
+    .distanceText {
+      color: silver;
+      font-family: 'open sans', arial, sans-serif;
+      font-size: 1em;
+      font-weight: 400;
+      margin-block-start: 0.25em;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+
+
+
+    #myInput {
+  background-image: url('/css/searchicon.png'); /* Add a search icon to input */
+  background-position: 10px 12px; /* Position the search icon */
+  background-repeat: no-repeat; /* Do not repeat the icon image */
+  width: 100%; /* Full-width */
+  font-size: 16px; /* Increase font-size */
+  padding: 12px 20px 12px 40px; /* Add some padding */
+  border: 1px solid #ddd; /* Add a grey border */
+  margin-bottom: 12px; /* Add some space below the input */
+}
+
+#leftPane {
+  display: none;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  max-width: 360px;
+  width: 35%;
+}
+
+#list{
+  list-style-type: none;
+    padding: 0;
+    height: 88vh;
+    overflow-y: scroll;
+}
+
+#list li a:hover{
+  text-decoration: none;
+}
+
+#list li a {
+  border: 1px solid #ddd;
+    margin-top: -1px;
+    background-color: #ffffff;
+    padding: 4px;
+    
+    display: block;
+}
+
+#list li a img {
+  height: 18px;
+  margin: 4px;
+}
+
+#list li a span.name{
+  text-decoration: none;
+    font-size: 14px;
+    color: black;
+}
+
+#list li a p.vicinity{
+  margin-left: 28px;
+    font-size: 10px;
+    color: #70757A;
+}
+
+#list li a:hover:not(.header) {
+  background-color: #eee; /* Add a hover effect to all links, except for headers */
+}
+
+
+
+.marker-highlight {
+  font-weight: bold;
+
+}
