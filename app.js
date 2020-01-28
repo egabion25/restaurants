@@ -3,12 +3,35 @@ const apiKey = 'AIzaSyDSCTkiWuux0aCqgqjxfmVRBmr2N1hb2ms';
 
 var infoWindow;
 var markers = [];
+
+
+var routeSource = null;
+var routeDestination = null;
+
+
+
+var markerArray = [];
+var directionsService = null;
+var directionsService = null;
+var directionsRenderer = null;
+var stepDisplay = null;
+var pointOfOrigin = null;
+
+
+
 //initial setup
 function initMap() {
 
+
+
  if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(function(position) {
-   //set to current
+   
+ 
+    pointOfOrigin = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+
+
+    //set to current
    initSetMap({
     lat: position.coords.latitude,
     lng: position.coords.longitude
@@ -23,7 +46,6 @@ function initMap() {
 
 
 function initSetMap(coordinates ) {
-
 
   //default coordinates
   if( coordinates == undefined){
@@ -44,6 +66,18 @@ function initSetMap(coordinates ) {
  });
 
 
+ markerArray = [];
+
+ // Instantiate a directions service.
+ directionsService = new google.maps.DirectionsService;
+  // Instantiate a directions service.
+ directionsService = new google.maps.DirectionsService;
+ // Instantiate an info window to hold step text.
+ stepDisplay = new google.maps.InfoWindow;
+  // Create a renderer for directions and bind it to the map.
+  directionsRenderer = new google.maps.DirectionsRenderer({map: map});
+
+  
  // Define the custom marker icons, using the store's "category".
  map.data.setStyle((feature) => {
   return {
@@ -281,11 +315,17 @@ function showStoresList(stores) {
  var results_list = "";
  stores.forEach((store) => {
 
-  results_list = results_list + '<li> <a href="#" id="store-' + store.place_id + '">' +
+  results_list = results_list + '<li> <div id="store-' + store.place_id + '">' +
    '<img src="' + store.icon + '">' +
    '<span class="name">' + store.name + '</span>' +
-   '<p class="vicinity">' + store.vicinity + '</p>' +
-   '</a></li>';
+   '<p class="vicinity">' + store.vicinity + '</p>';
+
+    if( pointOfOrigin){
+      results_list = results_list + '<a href="#" position="'+ store.geometry.location +'" class="directions">Directions</a>';
+    }
+    
+  results_list = results_list + '</div></li>';
+
  });
 
  $("#list").append(results_list);
@@ -323,3 +363,21 @@ $("#filter-bar" ).on("click",function(){
 $("#filter-coffee" ).on("click",function(){
   getNearbyRestaurants(map.getCenter(),["cafe"]);
 });
+
+$(document).on("click", ".directions", function(e){
+  
+  var position_array = $(this).attr("position").replace('(', '').replace(')','').split(",");
+  
+// routeSource = {
+//                 lat: position_array[0],
+//                 lng: position_array[1]
+//               }
+
+              routeDestination = new google.maps.LatLng(position_array[0],position_array[1]);
+
+
+calculateAndDisplayRoute( directionsRenderer, directionsService, markerArray, stepDisplay, map, routeDestination );
+
+});
+
+

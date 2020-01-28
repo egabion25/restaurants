@@ -1,3 +1,84 @@
+
+const mapStyle = [{
+  'featureType': 'administrative',
+  'elementType': 'all',
+  'stylers': [{
+    'visibility': 'on',
+  },
+  {
+    'lightness': 33,
+  },
+  ],
+},
+{
+  'featureType': 'landscape',
+  'elementType': 'all',
+  'stylers': [{
+    'color': '#f2e5d4',
+  }],
+},
+{
+  'featureType': 'poi.park',
+  'elementType': 'geometry',
+  'stylers': [{
+    'color': '#c5dac6',
+  }],
+},
+{
+  'featureType': 'poi.park',
+  'elementType': 'labels',
+  'stylers': [{
+    'visibility': 'on',
+  },
+  {
+    'lightness': 20,
+  },
+  ],
+},
+{
+  'featureType': 'road',
+  'elementType': 'all',
+  'stylers': [{
+    'lightness': 20,
+  }],
+},
+{
+  'featureType': 'road.highway',
+  'elementType': 'geometry',
+  'stylers': [{
+    'color': '#c5c6c6',
+  }],
+},
+{
+  'featureType': 'road.arterial',
+  'elementType': 'geometry',
+  'stylers': [{
+    'color': '#e4d7c6',
+  }],
+},
+{
+  'featureType': 'road.local',
+  'elementType': 'geometry',
+  'stylers': [{
+    'color': '#fbfaf7',
+  }],
+},
+{
+  'featureType': 'water',
+  'elementType': 'all',
+  'stylers': [{
+    'visibility': 'on',
+  },
+  {
+    'color': '#acbcc9',
+  },
+  ],
+},
+
+
+
+];
+
 /**
  * Use Distance Matrix API to calculate distance from origin to each store.
  * @param {google.maps.Data} data The geospatial data object layer for the map
@@ -78,97 +159,63 @@ function sanitizeHTML(strings) {
   return result;
 }
 
+function calculateAndDisplayRoute(directionsRenderer, directionsService,
+  markerArray, stepDisplay, map, routeDestination) {
 
-/*
-function showStoresList(data, stores) {
-  if (stores.length == 0) {
-    console.log('empty stores');
-    return;
-  }
-
-  let panel = document.createElement('div');
-  // If the panel already exists, use it. Else, create it and add to the page.
-  if (document.getElementById('panel')) {
-    panel = document.getElementById('panel');
-    // If panel is already open, close it
-    if (panel.classList.contains('open')) {
-      panel.classList.remove('open');
-    }
-  } else {
-    panel.setAttribute('id', 'panel');
-    const body = document.body;
-    body.insertBefore(panel, body.childNodes[0]);
-  }
-
-
-  // Clear the previous details
-  while (panel.lastChild) {
-    panel.removeChild(panel.lastChild);
-  }
-
-  stores.forEach((store) => {
-    // Add store details with text formatting
-    const name = document.createElement('p');
-    name.classList.add('place');
-    const currentStore = data.getFeatureById(store.storeid);
-    name.textContent = currentStore.getProperty('name');
-    panel.appendChild(name);
-    const distanceText = document.createElement('p');
-    distanceText.classList.add('distanceText');
-    distanceText.textContent = store.distanceText;
-    panel.appendChild(distanceText);
-  });
-
-  // Open the panel
-  panel.classList.add('open');
-
-  return;
+      
+// First, remove any existing markers from the map.
+for (var i = 0; i < markerArray.length; i++) {
+  markerArray[i].setMap(null);
 }
 
-*/
-/*
-function showStoresList(data, stores) {
-  if (stores.length == 0) {
-    console.log('empty stores');
-    return;
-  }
 
-  let panel = document.createElement('div');
-  // If the panel already exists, use it. Else, create it and add to the page.
-  if (document.getElementById('panel')) {
-    panel = document.getElementById('panel');
-    // If panel is already open, close it
-    if (panel.classList.contains('open')) {
-      panel.classList.remove('open');
-    }
+directionsService.route({
+  origin: pointOfOrigin,
+  destination: routeDestination,
+  travelMode: 'WALKING',
+}, function(response, status) {
+  // Route the directions and pass the response to a function to create
+  // markers for each step.
+  if (status === 'OK') {
+    document.getElementById('warnings-panel').innerHTML =
+        '<b>' + response.routes[0].warnings + '</b>';
+
+
+    directionsRenderer.setDirections(response);
+
+
+    showSteps(response, markerArray, stepDisplay, map);
   } else {
-    panel.setAttribute('id', 'panel');
-    const body = document.body;
-    body.insertBefore(panel, body.childNodes[0]);
+    window.alert('Directions request failed due to ' + status);
   }
-
-
-  // Clear the previous details
-  while (panel.lastChild) {
-    panel.removeChild(panel.lastChild);
-  }
-
-  stores.forEach((store) => {
-    // Add store details with text formatting
-    const name = document.createElement('p');
-    name.classList.add('place');
-    const currentStore = data.getFeatureById(store.storeid);
-    name.textContent = currentStore.getProperty('name');
-    panel.appendChild(name);
-    const distanceText = document.createElement('p');
-    distanceText.classList.add('distanceText');
-    distanceText.textContent = store.distanceText;
-    panel.appendChild(distanceText);
-  });
-
-  // Open the panel
-  panel.classList.add('open');
-
-  return;
+});
 }
-*/
+
+
+
+
+
+
+
+function showSteps(directionResult, markerArray, stepDisplay, map) {
+// For each step, place a marker, and add the text to the marker's infowindow.
+// Also attach the marker to an array so we can keep track of it and remove it
+// when calculating new routes.
+var myRoute = directionResult.routes[0].legs[0];
+for (var i = 0; i < myRoute.steps.length; i++) {
+  var marker = markerArray[i] = markerArray[i] || new google.maps.Marker;
+  marker.setMap(map);
+  marker.setPosition(myRoute.steps[i].start_location);
+  attachInstructionText(
+      stepDisplay, marker, myRoute.steps[i].instructions, map);
+}
+}
+
+function attachInstructionText(stepDisplay, marker, text, map) {
+google.maps.event.addListener(marker, 'click', function() {
+  // Open an info window when the marker is clicked on, containing the text
+  // of the step.
+  stepDisplay.setContent(text);
+  stepDisplay.open(map, marker);
+});
+}
