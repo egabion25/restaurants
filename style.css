@@ -123,14 +123,23 @@
 }
 
 #leftPane {
-  display: none;
+  /* display: none;
   list-style-type: none;
   padding: 0;
   margin: 0;
   position: absolute;
   top: 0;
   max-width: 360px;
-  width: 35%;
+  width: 35%; */
+  display: none;
+  list-style-type: none;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    max-width: 360px;
+    width: 35%;
+    height: 100%;
+    overflow-y: hidden;
 }
 
 #list{
@@ -188,3 +197,23 @@
   font-weight: bold;
 
 }
+
+
+#draw-panel{
+  z-index: 99;
+  bottom: 1%;
+  right: 3%;
+}
+
+#draw-panel span:hover{
+  text-decoration: none;
+}
+
+#remove-circle{
+ display: none; 
+}
+
+
+#search-circle{
+  display: none; 
+ }

@@ -4,19 +4,30 @@ const apiKey = 'AIzaSyDSCTkiWuux0aCqgqjxfmVRBmr2N1hb2ms';
 var infoWindow;
 var markers = [];
 
+// default establishment type
+var establishment_type = ['restaurant'];
 
-var routeSource = null;
+// handles destination when routing is used
 var routeDestination = null;
 
-
-
+//markers for route
 var markerArray = [];
-var directionsService = null;
+
+//Global instances
 var directionsService = null;
 var directionsRenderer = null;
+
+//for routes steps
 var stepDisplay = null;
+
+//Default
 var pointOfOrigin = null;
 
+// for drawings
+var customCircle = null;
+
+//default search radius
+var searchRadius = 500;
 
 
 //initial setup
@@ -68,12 +79,12 @@ function initSetMap(coordinates ) {
 
  markerArray = [];
 
- // Instantiate a directions service.
- directionsService = new google.maps.DirectionsService;
   // Instantiate a directions service.
  directionsService = new google.maps.DirectionsService;
+
  // Instantiate an info window to hold step text.
  stepDisplay = new google.maps.InfoWindow;
+
   // Create a renderer for directions and bind it to the map.
   directionsRenderer = new google.maps.DirectionsRenderer({map: map});
 
@@ -91,7 +102,7 @@ function initSetMap(coordinates ) {
 
  buildAutocomplete(map, coordinates);
 
- getNearbyRestaurants(coordinates);
+ getNearbyRestaurants();
 
 }
 
@@ -124,7 +135,7 @@ function buildAutocomplete(map, coordinates) {
   map: map
  });
  originMarker.setVisible(false);
- let originLocation = map.getCenter();
+ let map_center = map.getCenter();
  originMarker.setVisible(false);
 
 
@@ -133,7 +144,7 @@ function buildAutocomplete(map, coordinates) {
  autocomplete.addListener('place_changed', async () => {
 
 
-  originLocation = map.getCenter();
+  map_center = map.getCenter();
   const place = autocomplete.getPlace();
 
   $("#result-header").text("Restaurants near " + place.name);
@@ -147,22 +158,30 @@ function buildAutocomplete(map, coordinates) {
 
 
   // Recenter the map to the selected address
-  originLocation = place.geometry.location;
-  map.setCenter(originLocation);
+  map_center = place.geometry.location;
+  map.setCenter(map_center);
   map.setZoom(18);
   console.log(place);
 
-  getNearbyRestaurants(originLocation);
+  getNearbyRestaurants();
   return;
  });
 
 }
 
-function getNearbyRestaurants(originLocation, establishment_type ) {
+function getNearbyRestaurants() {
+  clear();
+
+  if(customCircle == null){
+    search_coordinates = map.getCenter();
+  }else{
+    search_coordinates = customCircle.center;
+  }
+
 
   // Get name of the area
    var request = {
-    location: originLocation,
+    location: search_coordinates,
     radius: 1,
     type: ["locality","political"]
   };
@@ -175,29 +194,32 @@ function getNearbyRestaurants(originLocation, establishment_type ) {
     }
   });
 
+if(  customCircle != null ){
+  searchRadius = customCircle.radius;
+}
 
 
-  if(establishment_type == undefined){
-    establishment_type = ['restaurant'];
-  }
 
 //Search for nearby stores
  var service = new google.maps.places.PlacesService(map);
  var request = {
-  location: originLocation,
-  radius: 500,
+  location: search_coordinates,
+  radius: searchRadius,
   types: establishment_type
  }
 
- service.nearbySearch(request, callback);
+ console.log("Search results for " + establishment_type[0] + " at" + search_coordinates.toString() +" within " + searchRadius + " meter radius"   );
+ 
+service.nearbySearch(request, callback);
 }
 
 
 function callback(results, status) {
 
  var positions = [];
-
  if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+
 
   showStoresList(results);
 
@@ -208,12 +230,8 @@ function callback(results, status) {
    anchor: new google.maps.Point(0, 0)
   };
 
-  //delete all previous markers
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
-    markers[i] = null;
-  }
-  markers = [];
+
+
 
 
 
@@ -286,11 +304,6 @@ function callback(results, status) {
    })(markers[i], i));
 
 
-
-
-
-
-
   }
 
 
@@ -347,37 +360,111 @@ function buildControls(map, options) {
 
 
 $("#filter-restaurant" ).on("click",function(){
-  getNearbyRestaurants(map.getCenter(),["restaurant"]);
+  
+  establishment_type = ["restaurant"];
+  getNearbyRestaurants(null);
 });
 
 
 $("#filter-hotel" ).on("click",function(){
-  getNearbyRestaurants(map.getCenter(),["lodging"]);
+
+
+
+  
+
+
+  establishment_type = ["lodging"];
+  getNearbyRestaurants();
 });
 
 $("#filter-bar" ).on("click",function(){
-  getNearbyRestaurants(map.getCenter(),["bar"]);
+  establishment_type = ["bar"];
+  getNearbyRestaurants();
 });
 
 
 $("#filter-coffee" ).on("click",function(){
-  getNearbyRestaurants(map.getCenter(),["cafe"]);
+  establishment_type = ["cafe"];
+  getNearbyRestaurants();
+
 });
 
+
 $(document).on("click", ".directions", function(e){
-  
-  var position_array = $(this).attr("position").replace('(', '').replace(')','').split(",");
-  
-// routeSource = {
-//                 lat: position_array[0],
-//                 lng: position_array[1]
-//               }
-
-              routeDestination = new google.maps.LatLng(position_array[0],position_array[1]);
-
-
+var position_array = $(this).attr("position").replace('(', '').replace(')','').split(",");
+routeDestination = new google.maps.LatLng(position_array[0],position_array[1]);
 calculateAndDisplayRoute( directionsRenderer, directionsService, markerArray, stepDisplay, map, routeDestination );
 
 });
 
 
+
+$("#draw-circle" ).on("click",function(){
+
+    customCircle = new google.maps.Circle({ strokeColor: '#000000',
+                                            strokeOpacity: 0.8,
+                                            strokeWeight: 1,
+                                            fillColor: '#000000',
+                                            fillOpacity: 0.35,
+                                            map: map,
+                                            center: map.getCenter(),
+                                            radius: 100,
+                                            draggable: true,
+                                            editable: true
+                                          });
+
+
+  $("#draw-circle").hide();
+  $("#remove-circle").show();
+  $("#search-circle").show();
+
+});
+
+
+$("#remove-circle" ).on("click",function(){
+  customCircle.setMap(null);
+  customCircle = null;
+  $("#remove-circle" ).hide();
+  $("#search-circle" ).hide();
+  $("#draw-circle").show();
+
+  searchRadius = 500;
+  getNearbyRestaurants();
+
+});
+
+
+
+$("#search-circle").on("click", function(){
+
+
+  clear();
+  searchRadius = customCircle.radius;
+  getNearbyRestaurants();
+  
+
+});
+
+function clear(){
+
+  $("#list").empty();
+  // directionsRenderer.setMap(null)
+
+    //delete all previous markers
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+      markers[i] = null;
+    }
+    markers = [];
+
+    // Remove any existing route markers from the map.
+    for (var i = 0; i < markerArray.length; i++) {
+      markerArray[i].setMap(null);
+    }
+
+    directionsRenderer.setMap(null)
+  
+
+     // Create a renderer for directions and bind it to the map.
+  directionsRenderer = new google.maps.DirectionsRenderer({map: map});
+}
